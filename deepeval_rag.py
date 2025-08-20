@@ -109,7 +109,7 @@ class RAGDeepEvaluator:
 def main():
     """Main evaluation function"""
     try:
-        chunking_strategies = [500, 1024, 2048]
+        chunking_strategies = [500, 1024]
         all_results = []
         
         for chunk_size in chunking_strategies:
@@ -118,15 +118,25 @@ def main():
             # Initialize agent with current chunk size
             agent = RAGAgent(document_paths=["neurolink-system.txt"], chunk_size=chunk_size)
             
+            # Log hyperparameters
+            print(f"Hyperparameters:")
+            print(f"  - chunk_size: {agent.chunk_size}")
+            print(f"  - chunk_overlap: {agent.chunk_overlap}")
+            print(f"  - k (retrieval): {agent.k}")
+            print(f"  - embedding_model: {type(agent.embedding_model).__name__}")
+            
             # Initialize evaluator
             evaluator = RAGDeepEvaluator(agent)
             
             # Run evaluation
             results = evaluator.run_complete_evaluation()
             
-            # Store results
+            # Store results with hyperparameters
             config_result = {
-                'chunk_size': chunk_size,
+                'chunk_size': agent.chunk_size,
+                'chunk_overlap': agent.chunk_overlap,
+                'k': agent.k,
+                'embedding_model': type(agent.embedding_model).__name__,
                 'results': str(results)
             }
             all_results.append(config_result)
