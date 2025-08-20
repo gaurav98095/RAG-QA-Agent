@@ -109,18 +109,34 @@ class RAGDeepEvaluator:
 def main():
     """Main evaluation function"""
     try:
-        # Initialize agent
-        print("Initializing RAG Agent...")
-        agent = RAGAgent(document_paths=["neurolink-system.txt"])
+        chunking_strategies = [500, 1024, 2048]
+        all_results = []
         
-        # Initialize evaluator
-        evaluator = RAGDeepEvaluator(agent)
+        for chunk_size in chunking_strategies:
+            print(f"\n=== Evaluating chunk_size={chunk_size} ===")
+            
+            # Initialize agent with current chunk size
+            agent = RAGAgent(document_paths=["neurolink-system.txt"], chunk_size=chunk_size)
+            
+            # Initialize evaluator
+            evaluator = RAGDeepEvaluator(agent)
+            
+            # Run evaluation
+            results = evaluator.run_complete_evaluation()
+            
+            # Store results
+            config_result = {
+                'chunk_size': chunk_size,
+                'results': str(results)
+            }
+            all_results.append(config_result)
         
-        # Run complete evaluation
-        results = evaluator.run_complete_evaluation()
+        # Save all results
+        with open('chunking_evaluation_results.json', 'w') as f:
+            json.dump(all_results, f, indent=2)
         
-        print("\n=== Evaluation Summary ===")
-        print("Check deepeval_results.json for detailed results")
+        print("\n=== All Evaluations Complete ===")
+        print("Results saved to chunking_evaluation_results.json")
         
     except Exception as e:
         print(f"Error during evaluation: {e}")
