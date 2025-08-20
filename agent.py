@@ -59,23 +59,23 @@ class RAGAgent:
             You are a helpful assistant. Use the context below to answer the user's query. 
             Format your response strictly as a JSON object with the following structure:
 
-            {
+            {{
             "answer": "<a concise, complete answer to the user's query>",
             "citations": [
                 "<relevant quoted snippet or summary from source 1>",
                 "<relevant quoted snippet or summary from source 2>",
                 ...
             ]
-            }
+            }}
 
             Only include information that appears in the provided context. Do not make anything up.
             Only respond in JSON — No explanations needed. Only use information from the context. If 
             nothing relevant is found, respond with: 
 
-            {
+            {{
             "answer": "No relevant information available.",
             "citations": []
-            }
+            }}
 
 
             Context:
@@ -99,11 +99,11 @@ class RAGAgent:
             return {"error": "Invalid JSON returned from model", "raw_output": generated_answer}
 
 
-document_paths = ["neurolink-system.txt"]
-query = "What are recent milestones for neurolink systems?"
+if __name__ == "__main__":
+    document_paths = ["neurolink-system.txt"]
+    query = "What are recent milestones for neurolink systems?"
 
-agent = RAGAgent(document_paths)
-retrieved_docs = agent.retrieve(query)
-answer, retrieved_docs = agent.answer(query)
-print(answer)
+    agent = RAGAgent(document_paths)
+    answer = agent.answer(query)
+    print(answer)
 
