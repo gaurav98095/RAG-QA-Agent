@@ -63,12 +63,19 @@ class RAGDeepEvaluator:
             else:
                 actual_output = str(response)
             
-            # Create test case
+            # Create test case with hyperparameters in additional metadata
             test_case = LLMTestCase(
                 input=data['input'],
                 actual_output=actual_output,
                 expected_output=data['expected_output'],
-                retrieval_context=retrieved_docs
+                retrieval_context=retrieved_docs,
+                additional_metadata={
+                    'chunk_size': self.agent.chunk_size,
+                    'chunk_overlap': self.agent.chunk_overlap,
+                    'k_retrieval': self.agent.k,
+                    'embedding_model': type(self.agent.embedding_model).__name__,
+                    'context_keywords': data.get('context_keywords', [])
+                }
             )
             
             test_cases.append(test_case)
@@ -127,6 +134,10 @@ def main():
             
             # Initialize evaluator
             evaluator = RAGDeepEvaluator(agent)
+            
+            # Set experiment name with hyperparameters for Confident AI tracking
+            import os
+            os.environ['DEEPEVAL_EXPERIMENT_NAME'] = f'RAG_Eval_chunk_{chunk_size}'
             
             # Run evaluation
             results = evaluator.run_complete_evaluation()

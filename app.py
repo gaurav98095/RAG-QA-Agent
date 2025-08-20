@@ -53,6 +53,16 @@ with st.sidebar:
 if st.session_state.agent:
     st.success("✅ Agent is ready!")
     
+    # Display current hyperparameters
+    with st.expander("Current Hyperparameters"):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Chunk Size", st.session_state.agent.chunk_size)
+            st.metric("K (Retrieval)", st.session_state.agent.k)
+        with col2:
+            st.metric("Chunk Overlap", st.session_state.agent.chunk_overlap)
+            st.metric("Embedding Model", type(st.session_state.agent.embedding_model).__name__)
+    
     # Display chat messages
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
