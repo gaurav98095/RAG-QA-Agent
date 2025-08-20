@@ -38,6 +38,14 @@ class RAGAgent:
 
         return self.vector_store_class.from_documents(documents, self.embedding_model)
     
+    def retrieve(self, query: str):
+        docs = self.vector_store.similarity_search(query, k=self.k)
+        context = [doc.page_content for doc in docs]
+        return context
+    
 document_paths = ["neurolink-system.txt"]
 agent = RAGAgent(document_paths)
-print(agent.vector_store)
+retrieved_docs = agent.retrieve("How many blood tests can you perform and how much blood do you need?")
+print(retrieved_docs)
+
+
