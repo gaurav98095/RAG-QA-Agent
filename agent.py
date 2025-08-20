@@ -60,6 +60,16 @@ class RAGAgent:
         )
         prompt = prompt.format(context=context, query=query)
         return model(prompt)
+    
+    def answer(
+        self, 
+        query: str,
+        llm_model=None, 
+        prompt_template: str = None
+    ):
+        retrieved_docs = self.retrieve(query)
+        generated_answer = self.generate(query, retrieved_docs, llm_model, prompt_template)
+        return generated_answer, retrieved_docs
 
 
 document_paths = ["neurolink-system.txt"]
@@ -67,6 +77,6 @@ query = "What are recent milestones for neurolink systems?"
 
 agent = RAGAgent(document_paths)
 retrieved_docs = agent.retrieve(query)
-generated_answer = agent.generate(query, retrieved_docs)
-print(generated_answer)
+answer, retrieved_docs = agent.answer(query)
+print(answer)
 
