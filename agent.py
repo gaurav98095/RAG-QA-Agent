@@ -3,7 +3,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.llms import OpenAI
-
+import json
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -88,15 +88,15 @@ class RAGAgent:
         prompt = prompt.format(context=context, query=query)
         return model(prompt)
     
-    def answer(
-        self, 
-        query: str,
-        llm_model=None, 
-        prompt_template: str = None
-    ):
+    def answer(self, query: str):
         retrieved_docs = self.retrieve(query)
-        generated_answer = self.generate(query, retrieved_docs, llm_model, prompt_template)
-        return generated_answer, retrieved_docs
+        generated_answer = self.generate(query, retrieved_docs)
+
+        try:
+            res = json.loads(generated_answer)
+            return res
+        except json.JSONDecodeError:
+            return {"error": "Invalid JSON returned from model", "raw_output": generated_answer}
 
 
 document_paths = ["neurolink-system.txt"]
