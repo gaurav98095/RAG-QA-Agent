@@ -2,6 +2,8 @@
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.llms import OpenAI
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -43,9 +45,28 @@ class RAGAgent:
         context = [doc.page_content for doc in docs]
         return context
     
-document_paths = ["neurolink-system.txt"]
-agent = RAGAgent(document_paths)
-retrieved_docs = agent.retrieve("How many blood tests can you perform and how much blood do you need?")
-print(retrieved_docs)
+    def generate(
+        self,
+        query: str, 
+        retrieved_docs: list, 
+        llm_model=None, 
+        prompt_template: str = None
+    ):
+        context = "\n".join(retrieved_docs)
+        model = llm_model or OpenAI(temperature=0)
+        prompt = prompt_template or (
+            "Answer the query using the context below.\n\nContext:\n{context}\n\nQuery:\n{query}"
+            "Only use information from the context. If nothing relevant is found, respond with: 'No relevant information available.'"
+        )
+        prompt = prompt.format(context=context, query=query)
+        return model(prompt)
 
+
+document_paths = ["neurolink-system.txt"]
+query = "What are recent milestones for neurolink systems?"
+
+agent = RAGAgent(document_paths)
+retrieved_docs = agent.retrieve(query)
+generated_answer = agent.generate(query, retrieved_docs)
+print(generated_answer)
 
